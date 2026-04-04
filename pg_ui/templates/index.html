@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prompt Generation (Ollama)</title>
+  <link rel="stylesheet" href="/static/app.css" />
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>Prompt Generation — Ollama</h1>
+      <p class="sub">This is the <strong>Prompt_generation</strong> app (port 8765), not Master_agent. Rough inputs below go to your local Ollama model to build a copy-paste master prompt.</p>
+    </div>
+    <div class="status" id="health">Checking Ollama…</div>
+  </header>
+
+  <main class="grid">
+    <section class="card inputs">
+      <h2>Customer input</h2>
+      <form id="form">
+        <label>Project title <input name="project_title" type="text" placeholder="e.g. Vendor onboarding portal" /></label>
+        <label>Business objective <textarea name="business_objective" rows="3" placeholder="What problem is solved, for whom, and why now?"></textarea></label>
+        <label>Target users <textarea name="target_users" rows="2" placeholder="Roles, segments, internal vs external"></textarea></label>
+        <label>Core features <textarea name="core_features" rows="4" placeholder="Bullet ideas welcome"></textarea></label>
+        <label>Platform
+          <select name="platform">
+            <option value="">—</option>
+            <option>Web</option>
+            <option>Mobile</option>
+            <option>Both</option>
+            <option>API</option>
+          </select>
+        </label>
+        <label>Budget range (optional) <input name="budget_range" type="text" placeholder="e.g. 50–80k USD" /></label>
+        <label>Timeline expectation <input name="timeline_expectation" type="text" placeholder="e.g. 12 weeks MVP" /></label>
+        <label>Region / market <input name="region_market" type="text" placeholder="e.g. EU B2B" /></label>
+        <label>Competitors / references <textarea name="competitors" rows="2"></textarea></label>
+        <label>Tech preference (optional) <input name="tech_preference" type="text" placeholder="e.g. Python, Azure" /></label>
+        <label>Additional rough notes <textarea name="additional_notes" rows="5" placeholder="Paste anything else: integrations, compliance, non-goals…"></textarea></label>
+        <div class="actions">
+          <button type="submit" id="btn">Generate master prompt</button>
+          <span class="hint" id="hint"></span>
+        </div>
+      </form>
+    </section>
+
+    <section class="card output">
+      <div class="out-head">
+        <h2>Generated prompt</h2>
+        <button type="button" id="copy" disabled>Copy</button>
+      </div>
+      <pre id="out" class="out">Fill the form and generate. Output appears here.</pre>
+    </section>
+  </main>
+
+  <script>
+    const healthEl = document.getElementById('health');
+    const form = document.getElementById('form');
+    const out = document.getElementById('out');
+    const copyBtn = document.getElementById('copy');
+    const hint = document.getElementById('hint');
+    const btn = document.getElementById('btn');
+
+    async function refreshHealth() {
+      try {
+        const r = await fetch('/api/health');
+        const j = await r.json();
+        if (j.ok && j.ollama_reachable) {
+          const has = (j.installed_models || []).includes(j.configured_model);
+          healthEl.textContent = has
+            ? 'Ollama: OK · model ' + j.configured_model
+            : 'Ollama: OK · model "' + j.configured_model + '" not listed in ollama list (pull or set OLLAMA_MODEL)';
+          healthEl.className = 'status ok';
+        } else {
+          healthEl.textContent = 'Ollama: unreachable (' + (j.ollama_url || '') + ')';
+          healthEl.className = 'status bad';
+        }
+      } catch (e) {
+        healthEl.textContent = 'Health check failed';
+        healthEl.className = 'status bad';
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const body = Object.fromEntries(fd.entries());
+      hint.textContent = 'Generating…';
+      btn.disabled = true;
+      copyBtn.disabled = true;
+      out.textContent = '…';
+      try {
+        const r = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        const j = await r.json();
+        if (!r.ok) {
+          const d = j.detail;
+          const msg = Array.isArray(d) ? d.map((x) => x.msg || JSON.stringify(x)).join('; ') : (d || r.statusText);
+          throw new Error(msg);
+        }
+        out.textContent = j.markdown || '';
+        copyBtn.disabled = !j.markdown;
+        hint.textContent = 'Done.';
+      } catch (err) {
+        out.textContent = 'Error: ' + err.message;
+        hint.textContent = '';
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(out.textContent || '');
+      hint.textContent = 'Copied.';
+      setTimeout(() => { hint.textContent = ''; }, 2000);
+    });
+
+    refreshHealth();
+  </script>
+</body>
+</html>
