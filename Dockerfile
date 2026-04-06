@@ -6,7 +6,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+ENV PORT=8765
 ENV OLLAMA_BASE_URL=http://host.docker.internal:11434
 EXPOSE 8765
 
-CMD ["uvicorn", "pg_ui.app:app", "--host", "0.0.0.0", "--port", "8765"]
+CMD ["python", "launch.py"]

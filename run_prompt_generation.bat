@@ -2,19 +2,18 @@
 setlocal EnableExtensions
 cd /d "%~dp0"
 
-title Prompt Generation - port 8765
+title Prompt Generation
 
 echo.
 echo ============================================================
-echo   Prompt Generation  (this project only)
-echo   Ollama master-prompt UI  -  port 8765
+echo   Prompt Generation 
+echo   Ollama master-prompt UI
 echo ------------------------------------------------------------
 echo   Open in your browser AFTER the server starts:
 echo.
 echo     http://127.0.0.1:8765
 echo     http://localhost:8765
 echo.
-echo   (Master_agent is separate; it usually uses port 8000.)
 echo ============================================================
 echo.
 

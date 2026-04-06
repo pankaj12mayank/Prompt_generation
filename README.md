@@ -1,69 +1,235 @@
-# Prompt Generation
+Here’s your **clean, beginner-friendly README** rewritten in a simple step-by-step flow so **anyone can set it up locally without confusion** 👇
 
-Local web app that turns rough project notes into a single **master agent prompt** (consulting-style BRD/FRD package instructions). Uses **Ollama** only (no paid API).
+---
 
-## Prerequisites
+# 🚀 Prompt Generation (Local Setup Guide)
 
-- Python 3.11+
-- [Ollama](https://ollama.com/) running locally with a capable model, for example:
+This is a local web app that converts your rough project notes into a **structured master agent prompt (BRD/FRD style)** using **Ollama (no paid APIs required)**.
+
+---
+
+# 🧩 1. Prerequisites (Install First)
+
+Make sure you have:
+
+* ✅ Python **3.11+**
+* ✅ Ollama installed and running
+
+### Install model in Ollama:
 
 ```bash
-ollama pull llama3.2
+ollama pull llama3:latest
 ```
 
-## Setup
+---
+
+# 📁 2. Project Setup (One-Time)
+
+Open terminal and run:
 
 ```bash
 cd Prompt_generation
 python -m venv .venv
+```
+
+### Activate virtual environment:
+
+**Windows:**
+
+```bash
 .venv\Scripts\activate
+```
+
+**Mac/Linux:**
+
+```bash
+source .venv/bin/activate
+```
+
+---
+
+### Install dependencies:
+
+```bash
 pip install -r requirements.txt
+```
+
+---
+
+### Setup environment file:
+
+```bash
 copy .env.example .env
 ```
 
-Edit `.env` if needed (`OLLAMA_MODEL`, `OLLAMA_BASE_URL`).
+---
 
-## Run
+### Default `.env` (already configured):
 
-**Windows:** double-click `run_prompt_generation.bat` in this folder (uses `.venv`). The window prints the app URL; the browser opens to **http://127.0.0.1:8765** after a short delay.
+```env
+PORT=8765
+OLLAMA_MODEL=llama3:latest
+OLLAMA_BASE_URL=http://127.0.0.1:11434
+```
 
-This project uses **port 8765** only. *Master_agent* is a different app and typically uses **port 8000** — do not mix the two.
+👉 You can change **PORT or MODEL here anytime**
+
+---
+
+# ▶️ 3. Run the Application
+
+### ✅ Easiest (Windows):
+
+Double-click:
+
+```bash
+run_prompt_generation.bat
+```
+
+---
+
+### ✅ Manual way:
 
 ```bash
 python launch.py
 ```
 
-Open [http://127.0.0.1:8765](http://127.0.0.1:8765). Enter customer fields or paste rough notes, then **Generate master prompt**. Copy the Markdown into your downstream agent.
+---
 
-## API
+# 🌐 4. Open in Browser
 
-- `GET /api/health` — Ollama reachability and installed models
-- `POST /api/generate` — JSON body with the same field names as the form
+Go to:
 
-## Docker
+```
+http://127.0.0.1:8765
+```
 
-Ollama must be reachable from the container (often `host.docker.internal` on Docker Desktop). Build and run:
+---
+
+# ✍️ 5. How to Use
+
+1. Enter:
+
+   * Project Title
+   * Business Objective
+   * Features / Notes
+2. Click **"Generate Master Prompt"**
+3. Copy the generated Markdown
+4. Use it in your downstream AI agent
+
+---
+
+# 🔌 6. API Usage (Optional)
+
+### Health Check:
+
+```bash
+GET /api/health
+```
+
+### Generate Prompt:
+
+```bash
+POST /api/generate
+```
+
+Example body:
+
+```json
+{
+  "project_title": "Test Project",
+  "business_objective": "Testing generation",
+  "core_features": "Feature 1",
+  "additional_notes": "Note"
+}
+```
+
+---
+
+# 🐳 7. Run with Docker (Optional)
+
+### Build:
 
 ```bash
 docker build -t prompt-gen .
+```
+
+### Run:
+
+```bash
 docker run -p 8765:8765 -e OLLAMA_BASE_URL=http://host.docker.internal:11434 prompt-gen
 ```
 
-## Structure
+---
 
-| Path | Role |
-|------|------|
-| `data/canonical_prompt_structure.md` | Canonical sections the model must preserve |
-| `prompt_generation/builder.py` | System instructions + Ollama call |
-| `pg_ui/app.py` | FastAPI app (package is `pg_ui`, not `web`, so it never loads another project’s `web.app`) |
-| `pg_ui/templates/index.html` | Simple two-column UI |
+# 📂 8. Project Structure (Simple View)
 
-The model is instructed to keep the canonical skeleton and embed your project context; it should not invent budgets or features when data is missing.
+| Folder/File            | Purpose                    |
+| ---------------------- | -------------------------- |
+| `launch.py`            | Starts the app             |
+| `pg_ui/app.py`         | Backend (FastAPI)          |
+| `templates/index.html` | UI                         |
+| `builder.py`           | Prompt generation logic    |
+| `.env`                 | Config (PORT, MODEL, etc.) |
 
-## Troubleshooting
+---
 
-**Port 8765 shows Master_agent (wizard / requirement generation)**  
-You were hitting the wrong Python module: both projects used to expose `web.app`. This project now uses **`pg_ui.app`**. Stop all uvicorn windows, then start again from the `Prompt_generation` folder (`run_prompt_generation.bat` or `python launch.py`). The page title should read **Prompt Generation — Ollama**.
+# ⚙️ 9. Important Notes
 
-**http://localhost:8000 does nothing**  
-Master_agent’s UI only runs while its server is up. From the `Master_agent` folder run `run_web.bat` (or `python -m uvicorn web.app:app --host 0.0.0.0 --port 8000`). That is a **separate** terminal from Prompt_generation.
+✅ App runs on **PORT = 8765** (change in `.env` if needed)
+✅ Uses **Ollama default port = 11434**
+✅ Everything runs **locally (no internet required after setup)**
+
+---
+
+# 🛠️ 10. Troubleshooting
+
+### ❌ Wrong UI / Another project opens
+
+✔️ Stop all running terminals
+✔️ Restart using:
+
+```bash
+python launch.py
+```
+
+---
+
+### ❌ Ollama not working
+
+Check:
+
+```bash
+curl http://127.0.0.1:11434
+```
+
+---
+
+### ❌ Port already in use
+
+Change in `.env`:
+
+```env
+PORT=9000
+```
+
+---
+
+# ✅ Final Flow (Quick Summary)
+
+```text
+1. Install Python + Ollama
+2. Pull model (llama3)
+3. Setup venv + install requirements
+4. Copy .env
+5. Run app
+6. Open browser → generate prompt
+```
+
+---
+### How to verify
+1. Ensure your Ollama is running ( ollama serve ).
+2. Run the project using run_prompt_generation.bat or python launch.py .
+3. Open http://localhost:8765/ in your browser.
+4. Fill in the fields and click Generate Master Prompt .
+5. Once generated, test the Copy button to see the success state.

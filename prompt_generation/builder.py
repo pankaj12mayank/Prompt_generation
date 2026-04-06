@@ -7,55 +7,43 @@ from prompt_generation.ollama_client import chat_completion, load_canonical_stru
 
 @dataclass
 class RoughInput:
-    project_title: str
-    business_objective: str
-    target_users: str
-    core_features: str
-    platform: str
-    budget_range: str
-    timeline_expectation: str
-    region_market: str
-    competitors: str
-    tech_preference: str
-    additional_notes: str
+    role: str
+    goal: str
+    steps: str
+    review: str
+    output: str
+    additional_context: str
 
     def to_user_block(self) -> str:
         lines = [
-            "## Structured details (from customer)",
+            "## Structured prompt details",
             "",
-            f"1. Project Title: {self.project_title or '(not provided)'}",
-            f"2. Business Objective: {self.business_objective or '(not provided)'}",
-            f"3. Target Users: {self.target_users or '(not provided)'}",
-            f"4. Core Features: {self.core_features or '(not provided)'}",
-            f"5. Platform: {self.platform or '(not provided)'}",
-            f"6. Budget Range (optional): {self.budget_range or '(not provided)'}",
-            f"7. Timeline Expectation: {self.timeline_expectation or '(not provided)'}",
-            f"8. Region/Market: {self.region_market or '(not provided)'}",
-            f"9. Competitor / reference products: {self.competitors or '(not provided)'}",
-            f"10. Tech preference (optional): {self.tech_preference or '(not provided)'}",
+            f"1. Role: {self.role or '(not provided)'}",
+            f"2. Goal: {self.goal or '(not provided)'}",
+            f"3. Steps: {self.steps or '(not provided)'}",
+            f"4. After Execution Review: {self.review or '(not provided)'}",
+            f"5. Output format: {self.output or '(not provided)'}",
             "",
-            "## Additional rough notes",
+            "## Additional context",
             "",
-            self.additional_notes.strip() or "(none)",
+            self.additional_context.strip() or "(none)",
         ]
         return "\n".join(lines)
 
 
 def build_system_prompt(canonical: str) -> str:
-    return f"""You are a senior prompt engineer working for a consulting firm.
+    return f"""You are a Master Prompt Engineer.
 
-Your task: produce ONE complete Markdown document that is a "master agent prompt" for another LLM.
+Your task: Create a 100% accurate, highly effective master prompt for an AI agent based on the provided details.
 
 CRITICAL RULES (structure fidelity):
-1. Copy the EXACT section order, headings, separators (---), and bullet structure from the CANONICAL STRUCTURE below. Do not rename sections, merge them, or skip any.
-2. Preserve every numbered item under INPUT COLLECTION (1–10) and every PROCESS STEP (Step 1–10) with the same sub-bullets as in the canonical text.
-3. Preserve OUTPUT FORMAT (folder tree), FORMATTING RULES, POST-GENERATION REVIEW, OUTPUT MODE, CONSTRAINTS, and FINAL INSTRUCTION verbatim in meaning; you may only tighten wording if it stays equivalent—prefer verbatim.
-4. Customize content using ONLY facts inferable from the customer's input. Where the customer left gaps, keep the INPUT COLLECTION as instructions to ask the user, or add "(to be confirmed)" in brief—do not invent budgets, deadlines, or features.
-5. After ROLE and GOAL, insert a short "## Project context (embedded)" subsection (2–6 bullets) summarizing the customer's project so the downstream agent stays anchored. This is the only new top-level block you may add, and it must appear immediately after GOAL's bullet list and before INPUT COLLECTION.
-6. No emojis. No AI hype. Professional tone.
-7. Output ONLY the final Markdown document. No preamble or postscript.
+1. The generated prompt MUST have these sections in order: ROLE, GOAL, PROCESS STEPS, AFTER EXECUTION REVIEW, and OUTPUT FORMAT.
+2. Use the CANONICAL STRUCTURE below as a baseline for the layout, but prioritize the specific user inputs provided.
+3. If the user provided specific steps, use them exactly. If they are vague, expand them into professional, executable instructions.
+4. The 'AFTER EXECUTION REVIEW' section should include automated self-checks for the agent to ensure high-quality output.
+5. No AI-hype, no emojis, no preamble. Just the final Markdown document.
 
-CANONICAL STRUCTURE (must match this skeleton; fill project-specific parts only where appropriate):
+CANONICAL STRUCTURE (Baseline):
 
 {canonical}
 """

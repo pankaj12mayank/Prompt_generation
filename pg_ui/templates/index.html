@@ -1,84 +1,192 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Prompt Generation (Ollama)</title>
-  <link rel="stylesheet" href="/static/app.css" />
+  <title>Master Prompt Engineer | AI Prompt Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+    .glass { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+  </style>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
 </head>
-<body>
-  <header class="top">
-    <div>
-      <h1>Prompt Generation — Ollama</h1>
-      <p class="sub">This is the <strong>Prompt_generation</strong> app (port 8765), not Master_agent. Rough inputs below go to your local Ollama model to build a copy-paste master prompt.</p>
-    </div>
-    <div class="status" id="health">Checking Ollama…</div>
-  </header>
-
-  <main class="grid">
-    <section class="card inputs">
-      <h2>Customer input</h2>
-      <form id="form">
-        <label>Project title <input name="project_title" type="text" placeholder="e.g. Vendor onboarding portal" /></label>
-        <label>Business objective <textarea name="business_objective" rows="3" placeholder="What problem is solved, for whom, and why now?"></textarea></label>
-        <label>Target users <textarea name="target_users" rows="2" placeholder="Roles, segments, internal vs external"></textarea></label>
-        <label>Core features <textarea name="core_features" rows="4" placeholder="Bullet ideas welcome"></textarea></label>
-        <label>Platform
-          <select name="platform">
-            <option value="">—</option>
-            <option>Web</option>
-            <option>Mobile</option>
-            <option>Both</option>
-            <option>API</option>
-          </select>
-        </label>
-        <label>Budget range (optional) <input name="budget_range" type="text" placeholder="e.g. 50–80k USD" /></label>
-        <label>Timeline expectation <input name="timeline_expectation" type="text" placeholder="e.g. 12 weeks MVP" /></label>
-        <label>Region / market <input name="region_market" type="text" placeholder="e.g. EU B2B" /></label>
-        <label>Competitors / references <textarea name="competitors" rows="2"></textarea></label>
-        <label>Tech preference (optional) <input name="tech_preference" type="text" placeholder="e.g. Python, Azure" /></label>
-        <label>Additional rough notes <textarea name="additional_notes" rows="5" placeholder="Paste anything else: integrations, compliance, non-goals…"></textarea></label>
-        <div class="actions">
-          <button type="submit" id="btn">Generate master prompt</button>
-          <span class="hint" id="hint"></span>
+<body class="bg-[#0b0f1a] text-gray-100 min-h-screen selection:bg-brand-500/30">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-6 border-b border-gray-800">
+      <div>
+        <div class="flex items-center gap-3 mb-1">
+          <div class="p-2 bg-brand-500/10 rounded-lg">
+            <i data-lucide="sparkles" class="w-6 h-6 text-brand-400"></i>
+          </div>
+          <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-400 to-blue-500">
+            Master Prompt Engineer
+          </h1>
         </div>
-      </form>
-    </section>
-
-    <section class="card output">
-      <div class="out-head">
-        <h2>Generated prompt</h2>
-        <button type="button" id="copy" disabled>Copy</button>
+        <p class="text-gray-400 text-sm max-w-2xl">
+          Craft high-accuracy system prompts for your AI agents. Powered by <span class="text-brand-400 font-medium">Ollama</span> locally.
+        </p>
       </div>
-      <pre id="out" class="out">Fill the form and generate. Output appears here.</pre>
-    </section>
-  </main>
+      <div id="health" class="px-3 py-1.5 rounded-full border border-gray-800 text-xs font-medium flex items-center gap-2 bg-gray-900/50 transition-all duration-300">
+        <span class="w-2 h-2 rounded-full bg-gray-500 animate-pulse"></span>
+        <span>Checking connection...</span>
+      </div>
+    </header>
+
+    <main class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+      <!-- Input Section -->
+      <section class="glass rounded-2xl p-6 shadow-2xl animate-fade-in">
+        <div class="flex items-center gap-2 mb-6">
+          <i data-lucide="settings-2" class="w-5 h-5 text-brand-400"></i>
+          <h2 class="text-lg font-semibold">Prompt Configuration</h2>
+        </div>
+
+        <form id="form" class="space-y-5">
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-300">AI Role</label>
+            <input name="role" type="text" required
+              placeholder="e.g. Senior Full-Stack Security Auditor"
+              class="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all" />
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-300">Primary Goal</label>
+            <textarea name="goal" rows="2" required
+              placeholder="e.g. Conduct a comprehensive security audit of Node.js microservices, identifying vulnerabilities and providing remediation steps."
+              class="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all custom-scrollbar"></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-300">Process Steps</label>
+              <textarea name="steps" rows="4" required
+                placeholder="1. Analyze entry points&#10;2. Check dependency graph&#10;3. Validate input sanitization"
+                class="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all custom-scrollbar"></textarea>
+            </div>
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-300">Output Format</label>
+              <textarea name="output" rows="4" required
+                placeholder="Markdown report with severity levels (Low/Medium/High/Critical) and code snippets for fixes."
+                class="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all custom-scrollbar"></textarea>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-300">After Execution Review</label>
+            <textarea name="review" rows="2" required
+              placeholder="Verify that all OWASP Top 10 categories were covered and no false positives are reported without justification."
+              class="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all custom-scrollbar"></textarea>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-300">Additional Context (Optional)</label>
+            <textarea name="additional_context" rows="3"
+              placeholder="Focus specifically on JWT authentication and SQL injection vectors. Ignore deprecated libraries mentioned in package-lock.json."
+              class="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all custom-scrollbar"></textarea>
+          </div>
+
+          <div class="pt-2">
+            <button type="submit" id="btn"
+              class="w-full bg-brand-600 hover:bg-brand-500 text-white font-semibold py-3 rounded-xl shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
+              <i data-lucide="zap" class="w-5 h-5"></i>
+              <span>Generate Master Prompt</span>
+            </button>
+            <p id="hint" class="text-center text-xs text-gray-500 mt-3 h-4 transition-all"></p>
+          </div>
+        </form>
+      </section>
+
+      <!-- Output Section -->
+      <section class="lg:sticky lg:top-8 glass rounded-2xl flex flex-col h-[calc(100vh-10rem)] shadow-2xl animate-fade-in [animation-delay:0.1s]">
+        <div class="p-6 border-b border-gray-800 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="terminal" class="w-5 h-5 text-brand-400"></i>
+            <h2 class="text-lg font-semibold">Generated Prompt</h2>
+          </div>
+          <button type="button" id="copy" disabled
+            class="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 text-sm font-medium rounded-lg transition-all border border-gray-700 disabled:opacity-30 disabled:cursor-not-allowed active:scale-95">
+            <i data-lucide="copy" class="w-4 h-4"></i>
+            <span>Copy</span>
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-hidden relative">
+          <pre id="out" class="h-full w-full p-6 text-sm text-gray-300 overflow-auto custom-scrollbar whitespace-pre-wrap font-mono leading-relaxed bg-black/20">Ready to engineer your next prompt...
+          
+Fill in the details on the left and hit Generate.</pre>
+          
+          <div id="loading" class="hidden absolute inset-0 bg-[#0b0f1a]/80 flex flex-col items-center justify-center gap-4 backdrop-blur-sm transition-all duration-300">
+            <div class="w-12 h-12 border-4 border-brand-500/20 border-t-brand-500 rounded-full animate-spin"></div>
+            <p class="text-brand-400 font-medium animate-pulse">Consulting the LLM...</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <script>
+    lucide.createIcons();
+
     const healthEl = document.getElementById('health');
     const form = document.getElementById('form');
     const out = document.getElementById('out');
     const copyBtn = document.getElementById('copy');
     const hint = document.getElementById('hint');
     const btn = document.getElementById('btn');
+    const loading = document.getElementById('loading');
 
     async function refreshHealth() {
       try {
         const r = await fetch('/api/health');
         const j = await r.json();
+        const dot = healthEl.querySelector('span:first-child');
+        const text = healthEl.querySelector('span:last-child');
+        
         if (j.ok && j.ollama_reachable) {
           const has = (j.installed_models || []).includes(j.configured_model);
-          healthEl.textContent = has
-            ? 'Ollama: OK · model ' + j.configured_model
-            : 'Ollama: OK · model "' + j.configured_model + '" not listed in ollama list (pull or set OLLAMA_MODEL)';
-          healthEl.className = 'status ok';
+          text.textContent = `Ollama: ${j.configured_model}`;
+          dot.className = 'w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]';
+          healthEl.classList.add('border-emerald-500/30', 'bg-emerald-500/5');
         } else {
-          healthEl.textContent = 'Ollama: unreachable (' + (j.ollama_url || '') + ')';
-          healthEl.className = 'status bad';
+          text.textContent = 'Ollama Unreachable';
+          dot.className = 'w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]';
+          healthEl.classList.add('border-rose-500/30', 'bg-rose-500/5');
         }
       } catch (e) {
-        healthEl.textContent = 'Health check failed';
-        healthEl.className = 'status bad';
+        healthEl.querySelector('span:last-child').textContent = 'API Error';
       }
     }
 
@@ -86,10 +194,12 @@
       e.preventDefault();
       const fd = new FormData(form);
       const body = Object.fromEntries(fd.entries());
-      hint.textContent = 'Generating…';
+      
       btn.disabled = true;
       copyBtn.disabled = true;
-      out.textContent = '…';
+      loading.classList.remove('hidden');
+      hint.textContent = '';
+      
       try {
         const r = await fetch('/api/generate', {
           method: 'POST',
@@ -97,29 +207,67 @@
           body: JSON.stringify(body),
         });
         const j = await r.json();
+        
         if (!r.ok) {
           const d = j.detail;
           const msg = Array.isArray(d) ? d.map((x) => x.msg || JSON.stringify(x)).join('; ') : (d || r.statusText);
           throw new Error(msg);
         }
+        
         out.textContent = j.markdown || '';
         copyBtn.disabled = !j.markdown;
-        hint.textContent = 'Done.';
+        hint.textContent = 'Success! Prompt engineered.';
+        hint.className = 'text-center text-xs text-emerald-400 mt-3 h-4';
       } catch (err) {
         out.textContent = 'Error: ' + err.message;
-        hint.textContent = '';
+        hint.textContent = 'Generation failed.';
+        hint.className = 'text-center text-xs text-rose-400 mt-3 h-4';
       } finally {
         btn.disabled = false;
+        loading.classList.add('hidden');
       }
     });
 
     copyBtn.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(out.textContent || '');
-      hint.textContent = 'Copied.';
-      setTimeout(() => { hint.textContent = ''; }, 2000);
+      try {
+        const text = out.textContent;
+        if (!text) return;
+
+        // Clipboard API with fallback
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const textArea = document.createElement("textarea");
+          textArea.value = text;
+          textArea.style.position = "fixed";
+          textArea.style.left = "-999999px";
+          textArea.style.top = "-999999px";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          document.execCommand('copy');
+          textArea.remove();
+        }
+
+        const originalContent = copyBtn.innerHTML;
+        copyBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i><span>Copied!</span>`;
+        copyBtn.classList.remove('bg-gray-800', 'border-gray-700');
+        copyBtn.classList.add('bg-emerald-500/20', 'border-emerald-500/50', 'text-emerald-400');
+        lucide.createIcons();
+        
+        setTimeout(() => {
+          copyBtn.innerHTML = originalContent;
+          copyBtn.classList.add('bg-gray-800', 'border-gray-700');
+          copyBtn.classList.remove('bg-emerald-500/20', 'border-emerald-500/50', 'text-emerald-400');
+          lucide.createIcons();
+        }, 2000);
+      } catch (err) {
+        console.error('Copy failed:', err);
+      }
     });
 
     refreshHealth();
+    setInterval(refreshHealth, 10000);
   </script>
 </body>
 </html>

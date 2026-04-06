@@ -28,17 +28,12 @@ templates = Jinja2Templates(directory=str(_templates))
 
 
 class GenerateBody(BaseModel):
-    project_title: str = Field(default="", max_length=500)
-    business_objective: str = Field(default="", max_length=8000)
-    target_users: str = Field(default="", max_length=4000)
-    core_features: str = Field(default="", max_length=8000)
-    platform: str = Field(default="", max_length=500)
-    budget_range: str = Field(default="", max_length=500)
-    timeline_expectation: str = Field(default="", max_length=500)
-    region_market: str = Field(default="", max_length=500)
-    competitors: str = Field(default="", max_length=2000)
-    tech_preference: str = Field(default="", max_length=2000)
-    additional_notes: str = Field(default="", max_length=16000)
+    role: str = Field(default="", max_length=1000)
+    goal: str = Field(default="", max_length=5000)
+    steps: str = Field(default="", max_length=10000)
+    review: str = Field(default="", max_length=5000)
+    output: str = Field(default="", max_length=5000)
+    additional_context: str = Field(default="", max_length=16000)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -83,28 +78,22 @@ async def health() -> JSONResponse:
 async def generate(body: GenerateBody) -> JSONResponse:
     if not any(
         [
-            body.project_title.strip(),
-            body.business_objective.strip(),
-            body.additional_notes.strip(),
-            body.core_features.strip(),
+            body.role.strip(),
+            body.goal.strip(),
+            body.steps.strip(),
         ]
     ):
         raise HTTPException(
             status_code=400,
-            detail="Provide at least Project Title, Business Objective, Core Features, or Additional Notes.",
+            detail="Provide at least Role, Goal, or Steps to generate a prompt.",
         )
     rough = RoughInput(
-        project_title=body.project_title.strip(),
-        business_objective=body.business_objective.strip(),
-        target_users=body.target_users.strip(),
-        core_features=body.core_features.strip(),
-        platform=body.platform.strip(),
-        budget_range=body.budget_range.strip(),
-        timeline_expectation=body.timeline_expectation.strip(),
-        region_market=body.region_market.strip(),
-        competitors=body.competitors.strip(),
-        tech_preference=body.tech_preference.strip(),
-        additional_notes=body.additional_notes.strip(),
+        role=body.role.strip(),
+        goal=body.goal.strip(),
+        steps=body.steps.strip(),
+        review=body.review.strip(),
+        output=body.output.strip(),
+        additional_context=body.additional_context.strip(),
     )
     try:
         markdown = await generate_master_prompt(rough)
