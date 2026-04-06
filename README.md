@@ -1,5 +1,3 @@
-Here’s a **GitHub-ready README** version with clean structure, badges, and improved formatting for a professional repo:
-
 ---
 
 # Prompt Generation (Local Setup Guide)
