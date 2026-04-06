@@ -1,21 +1,37 @@
-Here’s your **clean, beginner-friendly README** rewritten in a simple step-by-step flow so **anyone can set it up locally without confusion** 👇
+Here’s a **GitHub-ready README** version with clean structure, badges, and improved formatting for a professional repo:
 
 ---
 
-# 🚀 Prompt Generation (Local Setup Guide)
+# Prompt Generation (Local Setup Guide)
 
-This is a local web app that converts your rough project notes into a **structured master agent prompt (BRD/FRD style)** using **Ollama (no paid APIs required)**.
+![Python](https://img.shields.io/badge/Python-3.11+-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green)
+![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-orange)
+![License](https://img.shields.io/badge/License-MIT-lightgrey)
+
+A local web application that converts rough project notes into a structured **Master Agent Prompt (BRD/FRD style)** using **Ollama**.
+No paid APIs required. Everything runs locally.
 
 ---
 
-# 🧩 1. Prerequisites (Install First)
+## Features
+
+* Converts unstructured notes into structured prompts
+* Fully local (no external API calls)
+* Simple web UI
+* FastAPI backend
+* Docker support
+
+---
+
+## Prerequisites
 
 Make sure you have:
 
-* ✅ Python **3.11+**
-* ✅ Ollama installed and running
+* Python 3.11+
+* Ollama installed and running
 
-### Install model in Ollama:
+### Install Ollama model
 
 ```bash
 ollama pull llama3:latest
@@ -23,24 +39,32 @@ ollama pull llama3:latest
 
 ---
 
-# 📁 2. Project Setup (One-Time)
+## Installation
 
-Open terminal and run:
+### 1. Clone the repository
 
 ```bash
+git clone <your-repo-url>
 cd Prompt_generation
+```
+
+---
+
+### 2. Create virtual environment
+
+```bash
 python -m venv .venv
 ```
 
-### Activate virtual environment:
+Activate it:
 
-**Windows:**
+**Windows**
 
 ```bash
 .venv\Scripts\activate
 ```
 
-**Mac/Linux:**
+**Mac/Linux**
 
 ```bash
 source .venv/bin/activate
@@ -48,7 +72,7 @@ source .venv/bin/activate
 
 ---
 
-### Install dependencies:
+### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -56,15 +80,13 @@ pip install -r requirements.txt
 
 ---
 
-### Setup environment file:
+### 4. Setup environment variables
 
 ```bash
 copy .env.example .env
 ```
 
----
-
-### Default `.env` (already configured):
+Default configuration:
 
 ```env
 PORT=8765
@@ -72,15 +94,11 @@ OLLAMA_MODEL=llama3:latest
 OLLAMA_BASE_URL=http://127.0.0.1:11434
 ```
 
-👉 You can change **PORT or MODEL here anytime**
-
 ---
 
-# ▶️ 3. Run the Application
+## Running the Application
 
-### ✅ Easiest (Windows):
-
-Double-click:
+### Option 1 (Windows)
 
 ```bash
 run_prompt_generation.bat
@@ -88,7 +106,7 @@ run_prompt_generation.bat
 
 ---
 
-### ✅ Manual way:
+### Option 2 (Manual)
 
 ```bash
 python launch.py
@@ -96,9 +114,9 @@ python launch.py
 
 ---
 
-# 🌐 4. Open in Browser
+## Access the App
 
-Go to:
+Open in browser:
 
 ```
 http://127.0.0.1:8765
@@ -106,34 +124,39 @@ http://127.0.0.1:8765
 
 ---
 
-# ✍️ 5. How to Use
+## Usage
 
 1. Enter:
 
    * Project Title
    * Business Objective
    * Features / Notes
-2. Click **"Generate Master Prompt"**
+
+2. Click **Generate Master Prompt**
+
 3. Copy the generated Markdown
-4. Use it in your downstream AI agent
+
+4. Use it in your AI workflow
 
 ---
 
-# 🔌 6. API Usage (Optional)
+## API Endpoints
 
-### Health Check:
+### Health Check
 
-```bash
+```http
 GET /api/health
 ```
 
-### Generate Prompt:
+---
 
-```bash
+### Generate Prompt
+
+```http
 POST /api/generate
 ```
 
-Example body:
+#### Request Body
 
 ```json
 {
@@ -146,48 +169,60 @@ Example body:
 
 ---
 
-# 🐳 7. Run with Docker (Optional)
+## Docker Setup (Optional)
 
-### Build:
+### Build image
 
 ```bash
 docker build -t prompt-gen .
 ```
 
-### Run:
+---
+
+### Run container
 
 ```bash
-docker run -p 8765:8765 -e OLLAMA_BASE_URL=http://host.docker.internal:11434 prompt-gen
+docker run -p 8765:8765 \
+-e OLLAMA_BASE_URL=http://host.docker.internal:11434 \
+prompt-gen
 ```
 
 ---
 
-# 📂 8. Project Structure (Simple View)
+## Project Structure
 
-| Folder/File            | Purpose                    |
-| ---------------------- | -------------------------- |
-| `launch.py`            | Starts the app             |
-| `pg_ui/app.py`         | Backend (FastAPI)          |
-| `templates/index.html` | UI                         |
-| `builder.py`           | Prompt generation logic    |
-| `.env`                 | Config (PORT, MODEL, etc.) |
-
----
-
-# ⚙️ 9. Important Notes
-
-✅ App runs on **PORT = 8765** (change in `.env` if needed)
-✅ Uses **Ollama default port = 11434**
-✅ Everything runs **locally (no internet required after setup)**
+```
+Prompt_generation/
+│
+├── launch.py              # Entry point
+├── builder.py            # Prompt generation logic
+├── pg_ui/
+│   └── app.py            # FastAPI backend
+├── templates/
+│   └── index.html        # UI
+├── requirements.txt
+├── .env
+└── run_prompt_generation.bat
+```
 
 ---
 
-# 🛠️ 10. Troubleshooting
+## Configuration
 
-### ❌ Wrong UI / Another project opens
+| Variable        | Description       | Default                                          |
+| --------------- | ----------------- | ------------------------------------------------ |
+| PORT            | App port          | 8765                                             |
+| OLLAMA_MODEL    | Model name        | llama3:latest                                    |
+| OLLAMA_BASE_URL | Ollama server URL | [http://127.0.0.1:11434](http://127.0.0.1:11434) |
 
-✔️ Stop all running terminals
-✔️ Restart using:
+---
+
+## Troubleshooting
+
+### App opens wrong UI
+
+* Stop all running terminals
+* Restart:
 
 ```bash
 python launch.py
@@ -195,9 +230,7 @@ python launch.py
 
 ---
 
-### ❌ Ollama not working
-
-Check:
+### Ollama not responding
 
 ```bash
 curl http://127.0.0.1:11434
@@ -205,9 +238,9 @@ curl http://127.0.0.1:11434
 
 ---
 
-### ❌ Port already in use
+### Port already in use
 
-Change in `.env`:
+Update `.env`:
 
 ```env
 PORT=9000
@@ -215,21 +248,272 @@ PORT=9000
 
 ---
 
-# ✅ Final Flow (Quick Summary)
+## Quick Start
 
 ```text
 1. Install Python + Ollama
 2. Pull model (llama3)
-3. Setup venv + install requirements
-4. Copy .env
-5. Run app
-6. Open browser → generate prompt
+3. Setup virtual environment
+4. Install dependencies
+5. Run the app
+6. Open browser and generate prompt
 ```
 
 ---
-### How to verify
-1. Ensure your Ollama is running ( ollama serve ).
-2. Run the project using run_prompt_generation.bat or python launch.py .
-3. Open http://localhost:8765/ in your browser.
-4. Fill in the fields and click Generate Master Prompt .
-5. Once generated, test the Copy button to see the success state.
+
+## Verification Steps
+
+1. Start Ollama:
+
+```bash
+ollama serve
+```
+
+2. Run app:
+
+```bash
+python launch.py
+```
+
+3. Open:
+
+```
+http://localhost:8765/
+```
+
+4. Generate a prompt and test the copy button
+
+---
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first.
+
+---
+
+## License
+
+This project is licensed under the MIT License.
+
+---
+
+Here’s an **enhanced GitHub README add-on** with all the sections you asked for. You can paste this below your existing README.
+
+---
+
+## Screenshots
+
+> Add your screenshots inside a `/docs/images` folder in your repo.
+
+### Home Screen
+
+![Home UI](docs/images/home.png)
+
+### Generated Prompt Output
+
+![Generated Output](docs/images/output.png)
+
+### Copy Success State
+
+![Copy State](docs/images/copy.png)
+
+---
+
+## Demo GIF
+
+> Place your demo GIF inside `/docs/demo.gif`
+
+![Demo](docs/demo.gif)
+
+**Tip to create GIF:**
+
+* Use tools like:
+
+  * ScreenToGif (Windows)
+  * Kap (Mac)
+* Keep it under 10–15 seconds for GitHub performance
+
+---
+
+## Architecture Diagram
+
+```text
+User (Browser)
+     │
+     ▼
+Frontend (HTML UI - templates/index.html)
+     │
+     ▼
+FastAPI Backend (pg_ui/app.py)
+     │
+     ▼
+Prompt Builder (builder.py)
+     │
+     ▼
+Ollama API (localhost:11434)
+     │
+     ▼
+LLM Model (llama3)
+```
+
+---
+
+### Optional (Better Visual Diagram)
+
+You can generate a diagram using tools like:
+
+* draw.io
+* Excalidraw
+* Whimsical
+
+Save it as:
+
+```
+docs/images/architecture.png
+```
+
+Then embed:
+
+```md
+![Architecture](docs/images/architecture.png)
+```
+
+---
+
+## Deployment
+
+### Option 1: Render (Quick Cloud Deployment)
+
+1. Push code to GitHub
+2. Go to [https://render.com](https://render.com)
+3. Create **Web Service**
+4. Configure:
+
+* Build Command:
+
+```bash
+pip install -r requirements.txt
+```
+
+* Start Command:
+
+```bash
+python launch.py
+```
+
+* Environment Variables:
+
+```
+OLLAMA_BASE_URL=<your-ollama-server>
+PORT=8765
+```
+
+Important:
+
+* Render does NOT support local Ollama directly
+* You must host Ollama separately (EC2 recommended)
+
+---
+
+### Option 2: AWS EC2 (Recommended for Ollama)
+
+#### Step 1: Launch EC2
+
+* Ubuntu 22.04
+* t3.large or higher (for LLM performance)
+
+---
+
+#### Step 2: Install Ollama
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+ollama serve
+ollama pull llama3
+```
+
+---
+
+#### Step 3: Run App
+
+```bash
+git clone <repo>
+cd Prompt_generation
+
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+python launch.py
+```
+
+---
+
+#### Step 4: Open Ports
+
+Allow in security group:
+
+* 8765 (App)
+* 11434 (Ollama)
+
+---
+
+#### Step 5: Update `.env`
+
+```env
+OLLAMA_BASE_URL=http://<EC2-IP>:11434
+```
+
+---
+
+### Option 3: Internal Tool (Company Use)
+
+Best setup:
+
+* Backend: EC2 / Internal VM
+* Ollama: Same machine or GPU server
+* Access: VPN / Internal Network
+
+Flow:
+
+```text
+Employee → Internal URL → FastAPI → Ollama → Response
+```
+
+---
+
+## Production Improvements (Recommended)
+
+* Add Nginx reverse proxy
+* Use systemd to run app as service
+* Add authentication (basic auth / SSO)
+* Enable HTTPS
+
+---
+
+## Folder Structure for Assets
+
+```text
+docs/
+│
+├── images/
+│   ├── home.png
+│   ├── output.png
+│   ├── copy.png
+│   └── architecture.png
+│
+└── demo.gif
+```
+
+---
+
+## Pro Tips
+
+* Keep screenshots lightweight (<500KB)
+* Use consistent resolution
+* Blur sensitive data before uploading
+* Use dark/light mode consistently
+
+
+
+
