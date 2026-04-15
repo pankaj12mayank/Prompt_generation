@@ -15,7 +15,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
 from prompt_generation.builder import RoughInput, generate_master_prompt
-from prompt_generation.config import OLLAMA_BASE_URL, OLLAMA_MODEL
+from prompt_generation.config import LISTEN_PORT, OLLAMA_BASE_URL, OLLAMA_MODEL, PORT
 from prompt_generation.ollama_client import ollama_health
 
 app = FastAPI(title="Prompt Generation", version="1.0.0")
@@ -39,9 +39,9 @@ class GenerateBody(BaseModel):
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
-            "request": request,
             "ollama_url": OLLAMA_BASE_URL,
             "ollama_model": OLLAMA_MODEL,
         },
@@ -60,6 +60,8 @@ async def health() -> JSONResponse:
                 "ollama_url": OLLAMA_BASE_URL,
                 "configured_model": OLLAMA_MODEL,
                 "installed_models": models,
+                "app_port": LISTEN_PORT,
+                "configured_port": PORT,
             }
         )
     except Exception as e:
@@ -70,6 +72,8 @@ async def health() -> JSONResponse:
                 "ollama_reachable": False,
                 "ollama_url": OLLAMA_BASE_URL,
                 "error": str(e),
+                "app_port": LISTEN_PORT,
+                "configured_port": PORT,
             },
         )
 

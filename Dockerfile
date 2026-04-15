@@ -6,8 +6,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENV PORT=8765
+ARG APP_PORT=8765
+ENV PORT=${APP_PORT}
 ENV OLLAMA_BASE_URL=http://host.docker.internal:11434
-EXPOSE 8765
+EXPOSE ${APP_PORT}
 
 CMD ["python", "launch.py"]

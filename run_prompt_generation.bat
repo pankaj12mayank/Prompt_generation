@@ -9,13 +9,10 @@ echo ============================================================
 echo   Prompt Generation 
 echo   Ollama master-prompt UI
 echo ------------------------------------------------------------
-echo   Open in your browser AFTER the server starts:
-echo.
-echo     http://127.0.0.1:8765
-echo     http://localhost:8765
-echo.
-echo ============================================================
-echo.
+echo   Uses PORT from .env as the first port to try.
+echo   If that port is busy ^(other projects^), the next free port is used.
+echo   launch.py prints the real URL and can open your browser.
+echo ------------------------------------------------------------
 
 if not exist ".venv\Scripts\python.exe" (
   echo ERROR: Virtual environment not found.
@@ -34,10 +31,10 @@ if errorlevel 1 (
   exit /b 1
 )
 
-REM Open browser shortly after uvicorn begins listening
-start "PromptGen-open-browser" cmd /c "timeout /t 3 /nobreak >nul && start http://127.0.0.1:8765/"
+REM Avoid double browser: launch.py opens the correct port (including auto-pick).
+set PROMPT_GEN_NO_BROWSER=0
 
-echo Starting uvicorn...  (Ctrl+C to stop)
+echo Starting...  (Ctrl+C to stop)
 echo.
 python launch.py
 echo.
